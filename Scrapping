@@ -1,0 +1,71 @@
+import pandas as pd
+import requests
+from bs4 import BeautifulSoup
+html_tag = 'https://www.pararius.com/apartments/amsterdam?ac=1'
+web = requests.get(html_tag)
+web.status_code
+soup = BeautifulSoup(web.content, 'html.parser')
+results = soup.find_all('li', class_='search-list__item search-list__item--listing')
+len(results)
+homes = results[0].find('a', class_='listing-search-item__link listing-search-item__link--title').text
+addy = results[0].find('div', class_='listing-search-item__location').text.strip().replace('\n', '')
+rent = results[0].find('div', class_='listing-search-item__price').text.strip().replace('\n', '')
+space = results[0].find('li', class_='illustrated-features__item illustrated-features__item--surface-area').text
+rooms = results[0].find('li', class_='illustrated-features__item illustrated-features__item--number-of-rooms').text
+furniture = results[0].find('li',class_='illustrated-features__item illustrated-features__item--interior').text
+company = results[0].find('div', class_='listing-search-item__info').text.replace('\n', '')
+homes = []
+addy = []
+rent = []
+space = []
+rooms = []
+furniture = []
+company = []
+
+
+for result in results:
+    
+    try:
+        homes.append(result.find('a', class_='listing-search-item__link listing-search-item__link--title').text)
+    except:
+        homes.append('n/a')
+        
+    try:
+        addy.append(result.find('div', class_='listing-search-item__location').text.strip().replace('\n', ''))
+                    
+    except:
+        addy.append('n/a')    
+        
+    try:
+        rent.append(result.find('div', class_='listing-search-item__price').text.strip().replace('\n', ''))
+                    
+    except:
+        rent.append('n/a')    
+        
+    try:
+        space.append(result.find('li', class_='illustrated-features__item illustrated-features__item--surface-area').text)
+                    
+    except:
+        space.append('n/a')  
+        
+    try:
+        rooms.append(result.find('li', class_='illustrated-features__item illustrated-features__item--number-of-rooms').text)
+                    
+    except:
+        rooms.append('n/a')
+        
+    try:
+        furniture.append(result.find('li',class_='illustrated-features__item illustrated-features__item--interior').text)
+                    
+    except:
+        furniture.append('n/a')   
+        
+    try:
+        company.append(result.find('div', class_='listing-search-item__info').text.replace('\n', '')) 
+    except:
+        company.append('n/a')      
+        
+        
+listings_df = pd.DataFrame({'House_Name' : homes, 'Address' : addy, 'Rent' : rent , 'Space' : space, 'Rooms' : rooms, 'Furniture':furniture, 'Company' : company})
+listings_df.to_excel('house_listings.xlsx', index=False)
+        
